@@ -197,6 +197,30 @@
       document.getElementById("carrossel").innerText = nomes[i] + " acabou de comprar o plano anual!";
       i = (i + 1) % nomes.length;
     }, 5000);
+
+    function comprar() {
+      const email = document.getElementById("email").value;
+
+      fetch("https://igplus-server.replit.app/criar_pagamento", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          descricao: "Licença IGPLUS - 1 Ano",
+          preco: 99.00,
+          email: email
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.link_pagamento) {
+          window.location.href = data.link_pagamento;
+        } else {
+          alert("Erro ao gerar pagamento.");
+        }
+      });
+    }
+    <input type="email" id="email" placeholder="Seu e-mail">
+    <button onclick="comprar()">Comprar Licença</button>
   </script>
 </body>
 </html>
