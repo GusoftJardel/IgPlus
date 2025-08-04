@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagamento Pendente</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            padding: 50px;
+            background-color: #fff9c4;
+        }
+        h1 {
+            color: #f9a825;
+        }
+        p {
+            font-size: 18px;
+        }
+        a {
+            color: #f9a825;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>⌛ Pagamento Pendente</h1>
+    <p>Estamos aguardando a confirmação do seu pagamento.</p>
+    <p id="status-info">Verificando status do pagamento...</p>
+    <a href="https://gusoftjardel.github.io/IgPlus/">Voltar ao início</a>
+
+   <script>
+       const idTemp = "{{ id_temp }}";
+       const idCliente = "{{ id_temp }}";  // vem do backend
+       const statusInfo = document.getElementById("status-info");
+	   
+       localStorage.setItem("id_cliente", idCliente);
+       localStorage.setItem("id_temp", idTemp);
+	   
+       async function verificarStatus() {
+           if (!idCliente) return;
+	   
+           try {
+               const resposta = await fetch(`https://igplus-server-divine-frog-8777.fly.dev/status_pagamento?id_cliente=${idCliente}`);
+               const dados = await resposta.json();
+	   
+               console.log("Resposta da API:", dados);  // ✅ AQUI está correto
+	   
+               if (dados.status.trim() === "aprovado") {
+                   statusInfo.textContent = "✅ Pagamento confirmado! Redirecionando...";
+                   setTimeout(() => {
+                       window.location.href = `https://igplus-server-divine-frog-8777.fly.dev/retorno?status=approved&external_reference=${idCliente}`;
+                   }, 1500);
+               }
+           } catch (erro) {
+               console.error("Erro ao verificar status:", erro);
+               statusInfo.textContent = "❌ Erro ao verificar o status. Tentando novamente...";
+           }
+       }
+	   
+       setInterval(verificarStatus, 10000);
+   </script>
+
+</body>
+</html>
