@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagamento Pendente</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #fff9c4;
+        }
+        h1 {
+            color: #f9a825;
+        }
+        p {
+            font-size: 18px;
+        }
+        a, button {
+            color: #f9a825;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            display: inline-block;
+        }
+        #botaoManual {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-weight: bold;
+            background-color: #f9a825;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>⌛ Pagamento Pendente</h1>
+    <p>Estamos aguardando a confirmação do seu pagamento.</p>
+    <p id="status-info">Verificando status do pagamento...</p>
+    <button id="botaoManual">Ir manualmente</button><br>
+    <a href="https://gusoftjardel.github.io/IgPlus/">Voltar ao início</a>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const idCliente = urlParams.get("id_cliente");
+        const statusInfo = document.getElementById("status-info");
+        const botaoManual = document.getElementById("botaoManual");
+
+        localStorage.setItem("id_cliente", idCliente);
+        localStorage.setItem("id_temp", idCliente);
+
+        const destinoSucesso = `https://igplus-server-divine-frog-8777.fly.dev/retorno?status=approved&external_reference=${idCliente}`;
+
+        async function verificarStatus() {
+            if (!idCliente) {
+                statusInfo.textContent = "❌ ID do cliente não encontrado.";
+                return;
+            }
+
+            try {
+                const resposta = await fetch(`https://igplus-server-divine-frog-8777.fly.dev/status_pagamento?id_cliente=${idCliente}`);
+                const dados = await resposta.json();
+                console.log("Resposta da API:", dados);
+
+                if (dados.status && dados.status.trim().toLowerCase() === "aprovado") {
+                    statusInfo.textContent = "✅ Pagamento confirmado! Redirecionando...";
+                    setTimeout(() => {
+                        window.location.href = destinoSucesso;
+                    }, 1500);
+                    botaoManual.style.display = "none";
+                } else {
+                    statusInfo.textContent = "⏳ Aguardando confirmação...";
+                }
+            } catch (erro) {
+                console.warn("Erro ao verificar status:", erro);
+                statusInfo.textContent = "⚠️ Erro ao verificar status. Tentando novamente...";
+                botaoManual.style.display = "inline-block";
+            }
+        }
+
+        botaoManual.addEventListener("click", () => {
+            window.location.href = destinoSucesso;
+        });
+
+        verificarStatus();
+        setInterval(verificarStatus, 3000);
+    </script>
+</body>
+</html>
