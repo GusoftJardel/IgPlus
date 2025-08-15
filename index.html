@@ -369,7 +369,8 @@
     } else if (planoSelecionado === "trimestral") {
       preco = 79.90; descricao = "Plano Trimestral - Acesso por 3 meses";
     } else if (planoSelecionado === "anual") {
-      preco = 279.90; descricao = "Plano Anual - Acesso por 12 meses";
+      //preco = 279.90; descricao = "Plano Anual - Acesso por 12 meses";
+      preco = 0.90; descricao = "Plano Anual - Acesso por 12 meses";
     }
     try {
       const resposta = await fetch("https://igplus-server-divine-frog-8777.fly.dev/criar_pagamento", {
